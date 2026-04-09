@@ -12,6 +12,7 @@ from aws_cdk import (
     aws_iam as iam,
     aws_lambda as lambda_,
     aws_logs as logs,
+    Size
 )
 from constructs import Construct
 
@@ -50,7 +51,7 @@ class GenPRLambdaStack(Stack):
             ),
             timeout=Duration.seconds(900),  # 15 minutes (maximum for Lambda)
             memory_size=2048,  # 2GB memory
-            ephemeral_storage_size=lambda_.Size.mebibytes(2048),  # 2GB ephemeral storage
+            ephemeral_storage_size=Size.mebibytes(2048)(2048),  # 2GB ephemeral storage
             architecture=lambda_.Architecture.X86_64,  # Use x86_64 for compatibility
             environment={
                 "REPO_TOKEN": REPO_TOKEN,
