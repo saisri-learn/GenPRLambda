@@ -17,10 +17,10 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # GitHub Configuration
-    github_token: str = Field(..., description="GitHub Personal Access Token")
-    github_owner: str = Field(..., description="GitHub repository owner")
-    github_repo: str = Field(..., description="GitHub repository name")
+    # REPO Configuration
+    REPO_token: str = Field(..., description="REPO Personal Access Token")
+    REPO_owner: str = Field(..., description="REPO repository owner")
+    REPO_NAME: str = Field(..., description="REPO repository name")
     default_base_branch: str = Field(default="main", description="Default base branch")
 
     # LLM Configuration
@@ -43,16 +43,16 @@ class Settings(BaseSettings):
     )
 
     @property
-    def github_repo_url(self) -> str:
-        """Get the full GitHub repository URL."""
-        return f"https://github.com/{self.github_owner}/{self.github_repo}"
+    def REPO_NAME_url(self) -> str:
+        """Get the full REPO repository URL."""
+        return f"https://REPO.com/{self.REPO_owner}/{self.REPO_NAME}"
 
     def validate_required_fields(self) -> None:
         """Validate that all required fields are set."""
         required_fields = {
-            "github_token": self.github_token,
-            "github_owner": self.github_owner,
-            "github_repo": self.github_repo,
+            "REPO_token": self.REPO_token,
+            "REPO_owner": self.REPO_owner,
+            "REPO_NAME": self.REPO_NAME,
             "llm_api_key": self.llm_api_key,
         }
 

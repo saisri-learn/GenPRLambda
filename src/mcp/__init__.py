@@ -1,1 +1,1 @@
-"""MCP (Model Context Protocol) client for GitHub operations."""
+"""MCP (Model Context Protocol) client for REPO operations."""

@@ -1,4 +1,4 @@
-"""LangChain tools wrapping GitHub MCP client operations."""
+"""LangChain tools wrapping REPO MCP client operations."""
 
 import asyncio
 from typing import Any, Callable
@@ -6,7 +6,7 @@ from typing import Any, Callable
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from src.mcp.client import GitHubMCPClient
+from src.mcp.client import REPOMCPClient
 
 
 # Pydantic models for tool inputs
@@ -64,11 +64,11 @@ class CreatePullRequestInput(BaseModel):
     )
 
 
-def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
+def create_langchain_tools(mcp_client: REPOMCPClient) -> list[StructuredTool]:
     """Create LangChain tools from MCP client.
 
     Args:
-        mcp_client: Initialized GitHub MCP client
+        mcp_client: Initialized REPO MCP client
 
     Returns:
         List of LangChain StructuredTool instances
@@ -108,7 +108,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     list_files_tool = StructuredTool(
         name="list_repository_files",
         description=(
-            "List files and directories in the GitHub repository. "
+            "List files and directories in the REPO repository. "
             "Use this to explore the repository structure and find relevant files. "
             "Provide a path to list contents of a specific directory, or leave empty for root."
         ),
@@ -130,7 +130,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     read_file_tool = StructuredTool(
         name="read_file_contents",
         description=(
-            "Read the contents of a specific file from the GitHub repository. "
+            "Read the contents of a specific file from the REPO repository. "
             "Use this to understand the current code before making changes. "
             "Provide the full file path relative to the repository root."
         ),
@@ -159,7 +159,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     search_code_tool = StructuredTool(
         name="search_code",
         description=(
-            "Search for code patterns or keywords in the GitHub repository. "
+            "Search for code patterns or keywords in the REPO repository. "
             "Use this to find relevant files when you're unsure of their exact location. "
             "Returns file paths and matching code snippets."
         ),
@@ -179,7 +179,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     create_branch_tool = StructuredTool(
         name="create_branch",
         description=(
-            "Create a new branch in the GitHub repository. "
+            "Create a new branch in the REPO repository. "
             "Use this before making any file changes to work in an isolated branch. "
             "Choose a descriptive branch name like 'feature/add-logging' or 'fix/auth-bug'."
         ),
@@ -204,7 +204,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     update_file_tool = StructuredTool(
         name="update_file",
         description=(
-            "Update or create a file in the GitHub repository. "
+            "Update or create a file in the REPO repository. "
             "Use this to make code changes after creating a branch. "
             "Provide the complete new file content (not a diff). "
             "Can be called multiple times to update different files."
@@ -236,7 +236,7 @@ def create_langchain_tools(mcp_client: GitHubMCPClient) -> list[StructuredTool]:
     create_pr_tool = StructuredTool(
         name="create_pull_request",
         description=(
-            "Create a pull request in the GitHub repository. "
+            "Create a pull request in the REPO repository. "
             "Use this as the final step after making all file changes. "
             "Provide a clear title and detailed description of the changes made."
         ),

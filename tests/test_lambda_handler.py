@@ -48,7 +48,7 @@ def test_lambda_handler_success(valid_event, mock_context):
         mock_execute.return_value = {
             "success": True,
             "output": "PR created successfully",
-            "pr_url": "https://github.com/test/test/pull/1",
+            "pr_url": "https://REPO.com/test/test/pull/1",
         }
 
         response = lambda_handler(valid_event, mock_context)
@@ -56,7 +56,7 @@ def test_lambda_handler_success(valid_event, mock_context):
         assert response["statusCode"] == 200
         body = json.loads(response["body"])
         assert body["success"] is True
-        assert body["pr_url"] == "https://github.com/test/test/pull/1"
+        assert body["pr_url"] == "https://REPO.com/test/test/pull/1"
         assert "correlation_id" in body
 
 
@@ -98,7 +98,7 @@ def test_lambda_handler_api_gateway_format(api_gateway_event, mock_context):
         mock_execute.return_value = {
             "success": True,
             "output": "PR created successfully",
-            "pr_url": "https://github.com/test/test/pull/1",
+            "pr_url": "https://REPO.com/test/test/pull/1",
         }
 
         response = lambda_handler(api_gateway_event, mock_context)
@@ -155,7 +155,7 @@ def test_lambda_handler_custom_base_branch(mock_context):
         mock_execute.return_value = {
             "success": True,
             "output": "PR created",
-            "pr_url": "https://github.com/test/test/pull/1",
+            "pr_url": "https://REPO.com/test/test/pull/1",
         }
 
         response = lambda_handler(event, mock_context)

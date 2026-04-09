@@ -21,7 +21,7 @@ COPY requirements.txt package.json ./
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Node.js dependencies (GitHub MCP server)
+# Install Node.js dependencies (REPO MCP server)
 RUN npm install --production && npm cache clean --force
 
 # Copy source code

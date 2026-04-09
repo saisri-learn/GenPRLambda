@@ -52,9 +52,9 @@ jobs:
       - name: Run unit tests
         run: pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml || true
         env:
-          GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ secrets.TEST_GITHUB_OWNER }}
-          GITHUB_REPO: ${{ secrets.TEST_GITHUB_REPO }}
+          REPO_TOKEN: ${{ secrets.TEST_REPO_TOKEN }}
+          REPO_OWNER: ${{ secrets.TEST_REPO_OWNER }}
+          REPO_NAME: ${{ secrets.TEST_REPO_NAME }}
           LLM_PROVIDER: anthropic
           LLM_MODEL: claude-3-5-sonnet-20241022
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -71,7 +71,7 @@ jobs:
     name: Deploy to AWS
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: REPO.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -111,9 +111,9 @@ jobs:
           cd infrastructure/cdk
           cdk synth
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
-          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
           LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -126,9 +126,9 @@ jobs:
           cd infrastructure/cdk
           cdk deploy --require-approval never
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
-          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
           LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -153,9 +153,9 @@ jobs:
 
       - name: Deployment summary
         run: |
-          echo "## Deployment Complete! 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Lambda Function: genpr-lambda-function" >> $GITHUB_STEP_SUMMARY
-          echo "Region: ${{ secrets.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "View logs: https://console.aws.amazon.com/cloudwatch/home?region=${{ secrets.AWS_REGION }}#logsV2:log-groups/log-group/%2Faws%2Flambda%2Fgenpr-lambda-function" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Complete! 🚀" >> $REPO_STEP_SUMMARY
+          echo "" >> $REPO_STEP_SUMMARY
+          echo "Lambda Function: genpr-lambda-function" >> $REPO_STEP_SUMMARY
+          echo "Region: ${{ secrets.AWS_REGION }}" >> $REPO_STEP_SUMMARY
+          echo "" >> $REPO_STEP_SUMMARY
+          echo "View logs: https://console.aws.amazon.com/cloudwatch/home?region=${{ secrets.AWS_REGION }}#logsV2:log-groups/log-group/%2Faws%2Flambda%2Fgenpr-lambda-function" >> $REPO_STEP_SUMMARY

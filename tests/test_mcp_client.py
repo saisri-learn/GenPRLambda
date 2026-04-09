@@ -3,16 +3,16 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.mcp.client import GitHubMCPClient, MCPClientError
+from src.mcp.client import REPOMCPClient, MCPClientError
 
 
 @pytest.fixture
 def mcp_client():
     """Create a test MCP client."""
-    return GitHubMCPClient(
-        github_token="test_token",
-        github_owner="test_owner",
-        github_repo="test_repo",
+    return REPOMCPClient(
+        REPO_token="test_token",
+        REPO_owner="test_owner",
+        REPO_NAME="test_repo",
     )
 
 
