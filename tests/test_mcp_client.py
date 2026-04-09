@@ -10,9 +10,9 @@ from src.mcp.client import GitHubMCPClient, MCPClientError
 def mcp_client():
     """Create a test MCP client."""
     return GitHubMCPClient(
-        github_token="test_token",
-        github_owner="test_owner",
-        github_repo="test_repo",
+        REPO_TOKEN="test_token",
+        REPO_OWNER="test_owner",
+        REPO_NAME="test_repo",
     )
 
 

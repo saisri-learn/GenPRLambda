@@ -20,17 +20,17 @@ class MCPClientError(Exception):
 class GitHubMCPClient:
     """Client for communicating with GitHub MCP server via stdio."""
 
-    def __init__(self, github_token: str, github_owner: str, github_repo: str) -> None:
+    def __init__(self, REPO_TOKEN: str, REPO_OWNER: str, REPO_NAME: str) -> None:
         """Initialize the MCP client.
 
         Args:
-            github_token: GitHub Personal Access Token
-            github_owner: GitHub repository owner
-            github_repo: GitHub repository name
+            REPO_TOKEN: GitHub Personal Access Token
+            REPO_OWNER: GitHub repository owner
+            REPO_NAME: GitHub repository name
         """
-        self.github_token = github_token
-        self.github_owner = github_owner
-        self.github_repo = github_repo
+        self.REPO_TOKEN = REPO_TOKEN
+        self.REPO_OWNER = REPO_OWNER
+        self.REPO_NAME = REPO_NAME
         self.process: subprocess.Popen[bytes] | None = None
         self.request_id = 0
         self._started = False
@@ -46,7 +46,7 @@ class GitHubMCPClient:
 
             # Set environment variables for the MCP server
             env = {
-                "GITHUB_PERSONAL_ACCESS_TOKEN": self.github_token,
+                "GITHUB_PERSONAL_ACCESS_TOKEN": self.REPO_TOKEN,
                 "PATH": sys.path[0],  # Ensure node is in PATH
             }
 
@@ -174,8 +174,8 @@ class GitHubMCPClient:
             {
                 "name": "list_files",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "path": path,
                 },
             },
@@ -196,8 +196,8 @@ class GitHubMCPClient:
             {
                 "name": "get_file_contents",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "path": path,
                 },
             },
@@ -218,8 +218,8 @@ class GitHubMCPClient:
             {
                 "name": "search_code",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "query": query,
                 },
             },
@@ -241,8 +241,8 @@ class GitHubMCPClient:
             {
                 "name": "create_branch",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "branch": branch_name,
                     "from_branch": base_branch,
                 },
@@ -273,8 +273,8 @@ class GitHubMCPClient:
             {
                 "name": "push_files",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "branch": branch,
                     "files": [{"path": path, "content": content}],
                     "message": message,
@@ -306,8 +306,8 @@ class GitHubMCPClient:
             {
                 "name": "create_pull_request",
                 "arguments": {
-                    "owner": self.github_owner,
-                    "repo": self.github_repo,
+                    "owner": self.REPO_OWNER,
+                    "repo": self.REPO_NAME,
                     "title": title,
                     "body": body,
                     "head": head_branch,

@@ -30,9 +30,9 @@ class GenPRLambdaStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # Get configuration from environment variables or use defaults
-        github_token = os.environ.get("GITHUB_TOKEN", "")
-        github_owner = os.environ.get("GITHUB_OWNER", "")
-        github_repo = os.environ.get("GITHUB_REPO", "")
+        REPO_TOKEN = os.environ.get("REPO_TOKEN", "")
+        REPO_OWNER = os.environ.get("REPO_OWNER", "")
+        REPO_NAME = os.environ.get("REPO_NAME", "")
         llm_provider = os.environ.get("LLM_PROVIDER", "anthropic")
         llm_model = os.environ.get("LLM_MODEL", "claude-3-5-sonnet-20241022")
         llm_api_key = os.environ.get("LLM_API_KEY", "")
@@ -53,9 +53,9 @@ class GenPRLambdaStack(Stack):
             ephemeral_storage_size=lambda_.Size.mebibytes(2048),  # 2GB ephemeral storage
             architecture=lambda_.Architecture.X86_64,  # Use x86_64 for compatibility
             environment={
-                "GITHUB_TOKEN": github_token,
-                "GITHUB_OWNER": github_owner,
-                "GITHUB_REPO": github_repo,
+                "REPO_TOKEN": REPO_TOKEN,
+                "REPO_OWNER": REPO_OWNER,
+                "REPO_NAME": REPO_NAME,
                 "DEFAULT_BASE_BRANCH": "main",
                 "LLM_PROVIDER": llm_provider,
                 "LLM_MODEL": llm_model,

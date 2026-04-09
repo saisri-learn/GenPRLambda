@@ -184,9 +184,9 @@ def execute_agent_sync(
         """Async function to run the agent."""
         # Initialize MCP client
         mcp_client = GitHubMCPClient(
-            github_token=settings.github_token,
-            github_owner=settings.github_owner,
-            github_repo=settings.github_repo,
+            REPO_TOKEN=settings.REPO_TOKEN,
+            REPO_OWNER=settings.REPO_OWNER,
+            REPO_NAME=settings.REPO_NAME,
         )
 
         try:

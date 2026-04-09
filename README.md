@@ -63,9 +63,9 @@ Edit `.env`:
 
 ```bash
 # GitHub Configuration
-GITHUB_TOKEN=ghp_your_token_here
-GITHUB_OWNER=your-github-username
-GITHUB_REPO=your-repository-name
+REPO_TOKEN=ghp_your_token_here
+REPO_OWNER=your-github-username
+REPO_NAME=your-repository-name
 DEFAULT_BASE_BRANCH=main
 
 # LLM Configuration (Anthropic)
@@ -136,9 +136,9 @@ export AWS_ACCOUNT_ID=your-account-id
 export AWS_REGION=us-east-1
 
 # Set environment variables for deployment
-export GITHUB_TOKEN=ghp_xxx
-export GITHUB_OWNER=your-username
-export GITHUB_REPO=your-repo
+export REPO_TOKEN=ghp_xxx
+export REPO_OWNER=your-username
+export REPO_NAME=your-repo
 export LLM_PROVIDER=anthropic
 export LLM_MODEL=claude-3-5-sonnet-20241022
 export LLM_API_KEY=sk-ant-xxx
@@ -220,9 +220,9 @@ curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/genera
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `GITHUB_TOKEN` | Yes | - | GitHub Personal Access Token with `repo` scope |
-| `GITHUB_OWNER` | Yes | - | GitHub repository owner (username or organization) |
-| `GITHUB_REPO` | Yes | - | GitHub repository name |
+| `REPO_TOKEN` | Yes | - | GitHub Personal Access Token with `repo` scope |
+| `REPO_OWNER` | Yes | - | GitHub repository owner (username or organization) |
+| `REPO_NAME` | Yes | - | GitHub repository name |
 | `DEFAULT_BASE_BRANCH` | No | `main` | Default base branch for PRs |
 | `LLM_PROVIDER` | Yes | `anthropic` | LLM provider: `anthropic` or `openai` |
 | `LLM_MODEL` | Yes | `claude-3-5-sonnet-20241022` | LLM model identifier |
@@ -274,15 +274,15 @@ Add these secrets to your GitHub repository:
 - `AWS_ROLE_ARN`: IAM role ARN for OIDC authentication
 - `AWS_ACCOUNT_ID`: AWS account ID
 - `AWS_REGION`: AWS region (e.g., `us-east-1`)
-- `GITHUB_TOKEN`: GitHub token (automatically provided)
-- `GITHUB_OWNER`: Repository owner
-- `GITHUB_REPO`: Repository name
+- `REPO_TOKEN`: GitHub token (automatically provided)
+- `REPO_OWNER`: Repository owner
+- `REPO_NAME`: Repository name
 - `LLM_PROVIDER`: `anthropic` or `openai`
 - `LLM_MODEL`: Model identifier
 - `LLM_API_KEY`: LLM API key
-- `TEST_GITHUB_TOKEN`: Token for test repository (optional)
-- `TEST_GITHUB_OWNER`: Test repository owner (optional)
-- `TEST_GITHUB_REPO`: Test repository name (optional)
+- `TEST_REPO_TOKEN`: Token for test repository (optional)
+- `TEST_REPO_OWNER`: Test repository owner (optional)
+- `TEST_REPO_NAME`: Test repository name (optional)
 
 ## Development
 
@@ -426,9 +426,9 @@ Build and run the container locally:
 docker build -t genpr-lambda .
 
 docker run -p 9000:8080 \
-  -e GITHUB_TOKEN=xxx \
-  -e GITHUB_OWNER=xxx \
-  -e GITHUB_REPO=xxx \
+  -e REPO_TOKEN=xxx \
+  -e REPO_OWNER=xxx \
+  -e REPO_NAME=xxx \
   -e LLM_PROVIDER=anthropic \
   -e LLM_MODEL=claude-3-5-sonnet-20241022 \
   -e LLM_API_KEY=xxx \

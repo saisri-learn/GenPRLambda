@@ -12,9 +12,9 @@ from src.mcp.client import GitHubMCPClient
 def mock_settings():
     """Create mock settings."""
     settings = MagicMock(spec=Settings)
-    settings.github_token = "test_token"
-    settings.github_owner = "test_owner"
-    settings.github_repo = "test_repo"
+    settings.REPO_TOKEN = "test_token"
+    settings.REPO_OWNER = "test_owner"
+    settings.REPO_NAME = "test_repo"
     settings.llm_provider = "anthropic"
     settings.llm_model = "claude-3-5-sonnet-20241022"
     settings.llm_api_key = "test_api_key"
