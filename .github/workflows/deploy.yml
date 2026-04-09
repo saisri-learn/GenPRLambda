@@ -100,11 +100,10 @@ jobs:
           pip install -r requirements.txt
           npm install -g aws-cdk
 
-      - name: CDK Bootstrap (if needed)
+      - name: CDK Bootstrap
         run: |
           cd infrastructure/cdk
           cdk bootstrap
-        continue-on-error: true
 
       - name: CDK Synth
         run: |
