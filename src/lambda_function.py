@@ -1,11 +1,11 @@
-"""AWS Lambda handler for REPO PR automation agent."""
+"""AWS Lambda handler for GitHub PR automation agent."""
 
 import json
 from typing import Any
 
 from src.agent.langchain_agent import create_and_execute_agent
 from src.config.settings import get_settings
-from src.mcp.client import REPOMCPClient
+from src.mcp.client import GitHubMCPClient
 from src.utils.logger import get_logger
 from src.utils.validators import ValidationError, validate_event_payload, validate_prompt
 
@@ -183,10 +183,10 @@ def execute_agent_sync(
     async def run_agent() -> dict[str, Any]:
         """Async function to run the agent."""
         # Initialize MCP client
-        mcp_client = REPOMCPClient(
-            REPO_token=settings.REPO_token,
-            REPO_owner=settings.REPO_owner,
-            REPO_NAME=settings.REPO_NAME,
+        mcp_client = GitHubMCPClient(
+            github_token=settings.github_token,
+            github_owner=settings.github_owner,
+            github_repo=settings.github_repo,
         )
 
         try:

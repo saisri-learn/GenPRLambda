@@ -5,16 +5,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from src.agent.langchain_agent import CodeModificationAgent, create_and_execute_agent
 from src.config.settings import Settings
-from src.mcp.client import REPOMCPClient
+from src.mcp.client import GitHubMCPClient
 
 
 @pytest.fixture
 def mock_settings():
     """Create mock settings."""
     settings = MagicMock(spec=Settings)
-    settings.REPO_token = "test_token"
-    settings.REPO_owner = "test_owner"
-    settings.REPO_NAME = "test_repo"
+    settings.github_token = "test_token"
+    settings.github_owner = "test_owner"
+    settings.github_repo = "test_repo"
     settings.llm_provider = "anthropic"
     settings.llm_model = "claude-3-5-sonnet-20241022"
     settings.llm_api_key = "test_api_key"
@@ -26,13 +26,13 @@ def mock_settings():
 @pytest.fixture
 def mock_mcp_client():
     """Create mock MCP client."""
-    client = MagicMock(spec=REPOMCPClient)
+    client = MagicMock(spec=GitHubMCPClient)
     client.list_files = AsyncMock(return_value=[{"name": "test.py", "type": "file"}])
     client.read_file = AsyncMock(return_value="print('hello')")
     client.create_branch = AsyncMock(return_value={"ref": "refs/heads/test"})
     client.update_file = AsyncMock(return_value={"commit": "abc123"})
     client.create_pull_request = AsyncMock(
-        return_value={"number": 1, "html_url": "https://REPO.com/test/test/pull/1"}
+        return_value={"number": 1, "html_url": "https://github.com/test/test/pull/1"}
     )
     return client
 
@@ -82,7 +82,7 @@ async def test_agent_execute_success(mock_mcp_client, mock_settings):
 
     # Mock the agent executor
     mock_result = {
-        "output": "Successfully created PR #1\nURL: https://REPO.com/test/test/pull/1"
+        "output": "Successfully created PR #1\nURL: https://github.com/test/test/pull/1"
     }
 
     with patch.object(agent.agent_executor, "ainvoke", new_callable=AsyncMock) as mock_invoke:
@@ -92,7 +92,7 @@ async def test_agent_execute_success(mock_mcp_client, mock_settings):
 
         assert result["success"] is True
         assert "output" in result
-        assert result["pr_url"] == "https://REPO.com/test/test/pull/1"
+        assert result["pr_url"] == "https://github.com/test/test/pull/1"
 
 
 @pytest.mark.asyncio
@@ -113,10 +113,10 @@ def test_extract_pr_url(mock_mcp_client, mock_settings):
     """Test extracting PR URL from output."""
     agent = CodeModificationAgent(mock_mcp_client, mock_settings)
 
-    output = "Created PR at https://REPO.com/owner/repo/pull/123"
+    output = "Created PR at https://github.com/owner/repo/pull/123"
     pr_url = agent._extract_pr_url(output)
 
-    assert pr_url == "https://REPO.com/owner/repo/pull/123"
+    assert pr_url == "https://github.com/owner/repo/pull/123"
 
 
 def test_extract_pr_url_no_match(mock_mcp_client, mock_settings):
@@ -132,7 +132,7 @@ def test_extract_pr_url_no_match(mock_mcp_client, mock_settings):
 @pytest.mark.asyncio
 async def test_create_and_execute_agent(mock_settings):
     """Test convenience function for agent execution."""
-    mock_client = MagicMock(spec=REPOMCPClient)
+    mock_client = MagicMock(spec=GitHubMCPClient)
 
     with patch("src.agent.langchain_agent.CodeModificationAgent") as mock_agent_class:
         mock_agent = MagicMock()

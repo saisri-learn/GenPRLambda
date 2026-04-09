@@ -1,4 +1,4 @@
-"""MCP client for REPO operations via subprocess communication."""
+"""MCP client for GitHub operations via subprocess communication."""
 
 import asyncio
 import json
@@ -17,20 +17,20 @@ class MCPClientError(Exception):
     pass
 
 
-class REPOMCPClient:
-    """Client for communicating with REPO MCP server via stdio."""
+class GitHubMCPClient:
+    """Client for communicating with GitHub MCP server via stdio."""
 
-    def __init__(self, REPO_token: str, REPO_owner: str, REPO_NAME: str) -> None:
+    def __init__(self, github_token: str, github_owner: str, github_repo: str) -> None:
         """Initialize the MCP client.
 
         Args:
-            REPO_token: REPO Personal Access Token
-            REPO_owner: REPO repository owner
-            REPO_NAME: REPO repository name
+            github_token: GitHub Personal Access Token
+            github_owner: GitHub repository owner
+            github_repo: GitHub repository name
         """
-        self.REPO_token = REPO_token
-        self.REPO_owner = REPO_owner
-        self.REPO_NAME = REPO_NAME
+        self.github_token = github_token
+        self.github_owner = github_owner
+        self.github_repo = github_repo
         self.process: subprocess.Popen[bytes] | None = None
         self.request_id = 0
         self._started = False
@@ -42,18 +42,18 @@ class REPOMCPClient:
             return
 
         try:
-            logger.info("Starting REPO MCP server", stage="mcp_start")
+            logger.info("Starting GitHub MCP server", stage="mcp_start")
 
             # Set environment variables for the MCP server
             env = {
-                "REPO_PERSONAL_ACCESS_TOKEN": self.REPO_token,
+                "GITHUB_PERSONAL_ACCESS_TOKEN": self.github_token,
                 "PATH": sys.path[0],  # Ensure node is in PATH
             }
 
             # Start the MCP server process
             # The server should be installed via npm in the container
             self.process = subprocess.Popen(
-                ["npx", "-y", "@modelcontextprotocol/server-REPO"],
+                ["npx", "-y", "@modelcontextprotocol/server-github"],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -63,7 +63,7 @@ class REPOMCPClient:
 
             self._started = True
             logger.info(
-                "REPO MCP server started successfully",
+                "GitHub MCP server started successfully",
                 stage="mcp_start",
                 metadata={"pid": self.process.pid},
             )
@@ -79,7 +79,7 @@ class REPOMCPClient:
     async def stop(self) -> None:
         """Stop the MCP server subprocess."""
         if self.process:
-            logger.info("Stopping REPO MCP server", stage="mcp_stop")
+            logger.info("Stopping GitHub MCP server", stage="mcp_stop")
             self.process.terminate()
             try:
                 self.process.wait(timeout=5)
@@ -174,8 +174,8 @@ class REPOMCPClient:
             {
                 "name": "list_files",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "path": path,
                 },
             },
@@ -196,8 +196,8 @@ class REPOMCPClient:
             {
                 "name": "get_file_contents",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "path": path,
                 },
             },
@@ -218,8 +218,8 @@ class REPOMCPClient:
             {
                 "name": "search_code",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "query": query,
                 },
             },
@@ -241,8 +241,8 @@ class REPOMCPClient:
             {
                 "name": "create_branch",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "branch": branch_name,
                     "from_branch": base_branch,
                 },
@@ -273,8 +273,8 @@ class REPOMCPClient:
             {
                 "name": "push_files",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "branch": branch,
                     "files": [{"path": path, "content": content}],
                     "message": message,
@@ -306,8 +306,8 @@ class REPOMCPClient:
             {
                 "name": "create_pull_request",
                 "arguments": {
-                    "owner": self.REPO_owner,
-                    "repo": self.REPO_NAME,
+                    "owner": self.github_owner,
+                    "repo": self.github_repo,
                     "title": title,
                     "body": body,
                     "head": head_branch,
@@ -317,7 +317,7 @@ class REPOMCPClient:
         )
         return result
 
-    async def __aenter__(self) -> "REPOMCPClient":
+    async def __aenter__(self) -> "GitHubMCPClient":
         """Async context manager entry."""
         await self.start()
         return self

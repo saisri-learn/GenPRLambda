@@ -10,7 +10,7 @@ from langchain_openai import ChatOpenAI
 
 from src.agent.prompts import REACT_PROMPT_TEMPLATE, SYSTEM_PROMPT
 from src.config.settings import Settings
-from src.mcp.client import REPOMCPClient
+from src.mcp.client import GitHubMCPClient
 from src.mcp.tools import create_langchain_tools
 from src.utils.logger import get_logger
 
@@ -22,13 +22,13 @@ class CodeModificationAgent:
 
     def __init__(
         self,
-        mcp_client: REPOMCPClient,
+        mcp_client: GitHubMCPClient,
         settings: Settings,
     ) -> None:
         """Initialize the code modification agent.
 
         Args:
-            mcp_client: Initialized REPO MCP client
+            mcp_client: Initialized GitHub MCP client
             settings: Application settings
         """
         self.mcp_client = mcp_client
@@ -166,8 +166,8 @@ class CodeModificationAgent:
         """
         import re
 
-        # Look for REPO PR URLs
-        pr_url_pattern = r"https://REPO\.com/[\w-]+/[\w-]+/pull/\d+"
+        # Look for GitHub PR URLs
+        pr_url_pattern = r"https://github\.com/[\w-]+/[\w-]+/pull/\d+"
         match = re.search(pr_url_pattern, output)
 
         if match:
@@ -177,7 +177,7 @@ class CodeModificationAgent:
 
 
 async def create_and_execute_agent(
-    mcp_client: REPOMCPClient,
+    mcp_client: GitHubMCPClient,
     settings: Settings,
     prompt: str,
 ) -> dict[str, Any]:
@@ -186,7 +186,7 @@ async def create_and_execute_agent(
     This is a convenience function for one-shot agent execution.
 
     Args:
-        mcp_client: Initialized REPO MCP client
+        mcp_client: Initialized GitHub MCP client
         settings: Application settings
         prompt: User's natural language instruction
 

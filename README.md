@@ -1,6 +1,6 @@
-# GenPRLambda - AI-Powered REPO PR Automation
+# GenPRLambda - AI-Powered GitHub PR Automation
 
-AWS Lambda function that uses AI agents to automatically create Pull Requests in REPO repositories based on natural language prompts. Built with LangChain, REPO MCP server, and supports both Claude and OpenAI models.
+AWS Lambda function that uses AI agents to automatically create Pull Requests in GitHub repositories based on natural language prompts. Built with LangChain, GitHub MCP server, and supports both Claude and OpenAI models.
 
 ## Features
 
@@ -8,7 +8,7 @@ AWS Lambda function that uses AI agents to automatically create Pull Requests in
 - **Intelligent Code Modification**: AI agent explores repository, understands context, and makes appropriate changes
 - **Automated PR Creation**: Creates branches, commits changes, and opens pull requests automatically
 - **Multi-LLM Support**: Works with Claude (Anthropic) or GPT (OpenAI) models
-- **REPO MCP Integration**: Uses Model Context Protocol for reliable REPO operations
+- **GitHub MCP Integration**: Uses Model Context Protocol for reliable GitHub operations
 - **Production-Ready**: Container-based deployment with comprehensive error handling and logging
 - **API Gateway Support**: Optional REST API endpoint for HTTP invocations
 
@@ -21,21 +21,21 @@ API Gateway / Direct Invocation
         ↓
     LangChain ReAct Agent
         ↓
-    REPO MCP Server (Node.js, stdio transport)
+    GitHub MCP Server (Node.js, stdio transport)
         ↓
-    REPO API
+    GitHub API
 ```
 
 **Key Components:**
 - **Lambda Handler**: Orchestrates the workflow and handles requests
 - **LangChain Agent**: ReAct pattern agent for reasoning and action
-- **MCP Client**: Manages REPO MCP server subprocess
-- **LangChain Tools**: Wraps REPO operations (list files, read, write, create PR)
+- **MCP Client**: Manages GitHub MCP server subprocess
+- **LangChain Tools**: Wraps GitHub operations (list files, read, write, create PR)
 
 ## Prerequisites
 
 - **AWS Account** with permissions to create Lambda, API Gateway, CloudWatch resources
-- **REPO Account** with a Personal Access Token (PAT) with `repo` scope
+- **GitHub Account** with a Personal Access Token (PAT) with `repo` scope
 - **LLM API Key**: Either Anthropic API key or OpenAI API key
 - **Python 3.11+** for local development
 - **Node.js 20+** for MCP server
@@ -62,10 +62,10 @@ cp .env.example .env
 Edit `.env`:
 
 ```bash
-# REPO Configuration
-REPO_TOKEN=ghp_your_token_here
-REPO_OWNER=your-REPO-username
-REPO_NAME=your-repository-name
+# GitHub Configuration
+GITHUB_TOKEN=ghp_your_token_here
+GITHUB_OWNER=your-github-username
+GITHUB_REPO=your-repository-name
 DEFAULT_BASE_BRANCH=main
 
 # LLM Configuration (Anthropic)
@@ -136,9 +136,9 @@ export AWS_ACCOUNT_ID=your-account-id
 export AWS_REGION=us-east-1
 
 # Set environment variables for deployment
-export REPO_TOKEN=ghp_xxx
-export REPO_OWNER=your-username
-export REPO_NAME=your-repo
+export GITHUB_TOKEN=ghp_xxx
+export GITHUB_OWNER=your-username
+export GITHUB_REPO=your-repo
 export LLM_PROVIDER=anthropic
 export LLM_MODEL=claude-3-5-sonnet-20241022
 export LLM_API_KEY=sk-ant-xxx
@@ -220,9 +220,9 @@ curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/genera
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `REPO_TOKEN` | Yes | - | REPO Personal Access Token with `repo` scope |
-| `REPO_OWNER` | Yes | - | REPO repository owner (username or organization) |
-| `REPO_NAME` | Yes | - | REPO repository name |
+| `GITHUB_TOKEN` | Yes | - | GitHub Personal Access Token with `repo` scope |
+| `GITHUB_OWNER` | Yes | - | GitHub repository owner (username or organization) |
+| `GITHUB_REPO` | Yes | - | GitHub repository name |
 | `DEFAULT_BASE_BRANCH` | No | `main` | Default base branch for PRs |
 | `LLM_PROVIDER` | Yes | `anthropic` | LLM provider: `anthropic` or `openai` |
 | `LLM_MODEL` | Yes | `claude-3-5-sonnet-20241022` | LLM model identifier |
@@ -251,9 +251,9 @@ The AI agent follows this systematic workflow:
 6. **Make Changes**: Updates files with new content (can update multiple files)
 7. **Create PR**: Opens a pull request with description of changes
 
-## REPO Actions CI/CD
+## GitHub Actions CI/CD
 
-The repository includes a REPO Actions workflow (`.REPO/workflows/deploy.yml`) that:
+The repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that:
 
 1. **Test Job**: Runs on every push and PR
    - Linting (ruff)
@@ -267,22 +267,22 @@ The repository includes a REPO Actions workflow (`.REPO/workflows/deploy.yml`) t
    - Deploys CDK stack to AWS
    - Runs smoke tests
 
-### Required REPO Secrets
+### Required GitHub Secrets
 
-Add these secrets to your REPO repository:
+Add these secrets to your GitHub repository:
 
 - `AWS_ROLE_ARN`: IAM role ARN for OIDC authentication
 - `AWS_ACCOUNT_ID`: AWS account ID
 - `AWS_REGION`: AWS region (e.g., `us-east-1`)
-- `REPO_TOKEN`: REPO token (automatically provided)
-- `REPO_OWNER`: Repository owner
-- `REPO_NAME`: Repository name
+- `GITHUB_TOKEN`: GitHub token (automatically provided)
+- `GITHUB_OWNER`: Repository owner
+- `GITHUB_REPO`: Repository name
 - `LLM_PROVIDER`: `anthropic` or `openai`
 - `LLM_MODEL`: Model identifier
 - `LLM_API_KEY`: LLM API key
-- `TEST_REPO_TOKEN`: Token for test repository (optional)
-- `TEST_REPO_OWNER`: Test repository owner (optional)
-- `TEST_REPO_NAME`: Test repository name (optional)
+- `TEST_GITHUB_TOKEN`: Token for test repository (optional)
+- `TEST_GITHUB_OWNER`: Test repository owner (optional)
+- `TEST_GITHUB_REPO`: Test repository name (optional)
 
 ## Development
 
@@ -298,7 +298,7 @@ GenPRLambda/
 │   └── utils/                      # Utilities (logging, validation)
 ├── tests/                          # Unit tests
 ├── infrastructure/cdk/             # CDK infrastructure code
-├── .REPO/workflows/              # REPO Actions workflows
+├── .github/workflows/              # GitHub Actions workflows
 ├── Dockerfile                      # Container image definition
 ├── requirements.txt                # Python dependencies
 └── package.json                    # Node.js dependencies
@@ -357,7 +357,7 @@ Logs are output as JSON with the following fields:
 
 **Issue: MCP server fails to start**
 - Check that Node.js is installed in the container
-- Verify REPO token has correct permissions
+- Verify GitHub token has correct permissions
 - Check CloudWatch logs for subprocess errors
 
 **Issue: Agent timeout**
@@ -365,8 +365,8 @@ Logs are output as JSON with the following fields:
 - Increase Lambda timeout (max 15 minutes)
 - For very large changes, consider Step Functions
 
-**Issue: REPO API rate limits**
-- Use REPO App instead of PAT for higher rate limits
+**Issue: GitHub API rate limits**
+- Use GitHub App instead of PAT for higher rate limits
 - Implement caching for repository exploration
 - Add rate limit monitoring
 
@@ -388,7 +388,7 @@ Approximate costs for AWS resources:
 - **Secrets Management**: Store tokens in AWS Secrets Manager (recommended) or use environment variables
 - **IAM Roles**: Use least-privilege permissions
 - **Input Validation**: All prompts are validated and sanitized
-- **REPO Permissions**: Use REPO App with fine-grained permissions instead of PAT
+- **GitHub Permissions**: Use GitHub App with fine-grained permissions instead of PAT
 - **API Gateway**: Add authentication (API keys, Cognito, Lambda authorizers)
 - **Rate Limiting**: Implement rate limiting on API Gateway
 - **VPC**: Consider deploying Lambda in VPC for additional security
@@ -396,7 +396,7 @@ Approximate costs for AWS resources:
 ## Limitations
 
 - **Lambda Timeout**: Maximum 15 minutes per execution
-- **REPO Rate Limits**: 5000 requests/hour with PAT
+- **GitHub Rate Limits**: 5000 requests/hour with PAT
 - **Container Size**: 10GB maximum image size
 - **Complexity**: Very large codebases may require multiple iterations
 - **Branch Conflicts**: Does not handle merge conflicts automatically
@@ -408,7 +408,7 @@ Approximate costs for AWS resources:
 - [ ] PR review and iteration capabilities
 - [ ] Code validation and testing before PR
 - [ ] Slack/webhook notifications
-- [ ] REPO App authentication
+- [ ] GitHub App authentication
 - [ ] Streaming responses via WebSockets
 - [ ] Support for other Git providers (GitLab, Bitbucket)
 
@@ -426,9 +426,9 @@ Build and run the container locally:
 docker build -t genpr-lambda .
 
 docker run -p 9000:8080 \
-  -e REPO_TOKEN=xxx \
-  -e REPO_OWNER=xxx \
-  -e REPO_NAME=xxx \
+  -e GITHUB_TOKEN=xxx \
+  -e GITHUB_OWNER=xxx \
+  -e GITHUB_REPO=xxx \
   -e LLM_PROVIDER=anthropic \
   -e LLM_MODEL=claude-3-5-sonnet-20241022 \
   -e LLM_API_KEY=xxx \
@@ -456,13 +456,13 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues, questions, or contributions:
-- Open an issue on REPO
+- Open an issue on GitHub
 - Check existing issues and discussions
 - Review CloudWatch logs for debugging
 
 ## Acknowledgments
 
-- Built with [LangChain](https://REPO.com/langchain-ai/langchain)
-- Uses [Model Context Protocol (MCP)](https://REPO.com/modelcontextprotocol)
+- Built with [LangChain](https://github.com/langchain-ai/langchain)
+- Uses [Model Context Protocol (MCP)](https://github.com/modelcontextprotocol)
 - Powered by [Claude](https://www.anthropic.com/claude) or [OpenAI](https://openai.com/)
 - Deployed with [AWS CDK](https://aws.amazon.com/cdk/)

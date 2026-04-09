@@ -18,7 +18,7 @@ GenPRLambdaStack(
     app,
     "GenPRLambdaStack",
     env=cdk.Environment(account=account, region=region),
-    description="Lambda function for automated REPO PR creation using AI agents",
+    description="Lambda function for automated GitHub PR creation using AI agents",
 )
 
 app.synth()
