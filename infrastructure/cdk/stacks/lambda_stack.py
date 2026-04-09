@@ -48,6 +48,21 @@ class GenPRLambdaStack(Stack):
             code=lambda_.DockerImageCode.from_image_asset(
                 directory="../../",  # Root directory containing Dockerfile
                 file="Dockerfile",
+                exclude=[
+                    ".git",
+                    ".github",
+                    "infrastructure/cdk/cdk.out",
+                    "infrastructure/cdk/.cdk.staging",
+                    "tests",
+                    "*.md",
+                    ".vscode",
+                    ".idea",
+                    "__pycache__",
+                    "*.pyc",
+                    ".pytest_cache",
+                    ".coverage",
+                    "htmlcov",
+                ],
             ),
             timeout=Duration.seconds(900),  # 15 minutes (maximum for Lambda)
             memory_size=2048,  # 2GB memory
