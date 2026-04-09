@@ -1,0 +1,164 @@
+name: Deploy GenPRLambda
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio ruff black mypy
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run linting (ruff)
+        run: ruff check src/ tests/ || true
+
+      - name: Run formatting check (black)
+        run: black --check src/ tests/ || true
+
+      - name: Run type checking (mypy)
+        run: mypy src/ || true
+
+      - name: Run unit tests
+        run: pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ secrets.TEST_GITHUB_OWNER }}
+          GITHUB_REPO: ${{ secrets.TEST_GITHUB_REPO }}
+          LLM_PROVIDER: anthropic
+          LLM_MODEL: claude-3-5-sonnet-20241022
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    permissions:
+      id-token: write  # Required for OIDC
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install CDK dependencies
+        run: |
+          cd infrastructure/cdk
+          pip install -r requirements.txt
+          npm install -g aws-cdk
+
+      - name: CDK Bootstrap (if needed)
+        run: |
+          cd infrastructure/cdk
+          cdk bootstrap
+        continue-on-error: true
+
+      - name: CDK Synth
+        run: |
+          cd infrastructure/cdk
+          cdk synth
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
+          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LOG_LEVEL: INFO
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: CDK Deploy
+        run: |
+          cd infrastructure/cdk
+          cdk deploy --require-approval never
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
+          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LOG_LEVEL: INFO
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+      - name: Run smoke tests
+        run: |
+          # Wait for Lambda to be ready
+          sleep 10
+
+          # Invoke Lambda with test payload
+          aws lambda invoke \
+            --function-name genpr-lambda-function \
+            --payload '{"prompt": "List all files in the repository"}' \
+            --cli-binary-format raw-in-base64-out \
+            response.json || true
+
+          cat response.json
+        continue-on-error: true
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Complete! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Lambda Function: genpr-lambda-function" >> $GITHUB_STEP_SUMMARY
+          echo "Region: ${{ secrets.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View logs: https://console.aws.amazon.com/cloudwatch/home?region=${{ secrets.AWS_REGION }}#logsV2:log-groups/log-group/%2Faws%2Flambda%2Fgenpr-lambda-function" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,13 @@
+{
+  "name": "genpr-lambda",
+  "version": "0.1.0",
+  "description": "GitHub MCP server for Lambda function",
+  "private": true,
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/server-github": "^0.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
