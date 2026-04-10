@@ -103,7 +103,7 @@ jobs:
       - name: CDK Bootstrap
         run: |
           cd infrastructure/cdk
-          cdk bootstrap
+          cdk bootstrap --bootstrap-bucket-name cdk-hnb659fds-assets-789193817670-us-east-1 
 
       - name: CDK Synth
         run: |
